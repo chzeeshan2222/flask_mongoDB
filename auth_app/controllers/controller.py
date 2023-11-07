@@ -1,5 +1,6 @@
 from flask import  jsonify,request
 from ..db.config import mongo
+from datetime import datetime, timedelta
 from auth_app import bcrypt,app
 import jwt
 from functools import wraps
@@ -64,7 +65,11 @@ class allControllers:
                 password_hash = existing_user.get('password')
                 if bcrypt.check_password_hash(password_hash, data['password']):
                     try:
-                        token = jwt.encode({'email': data['email']},app.config['SECRET_KEY'], algorithm='HS256')
+                        expiration_time = datetime.utcnow() + timedelta(minutes=5)
+                        token = jwt.encode(
+                            {'email': data['email'], 'exp': expiration_time},  # Add 'exp' key with expiration time
+                            app.config['SECRET_KEY'],
+                            algorithm='HS256')
                         return jsonify({
                             "message": "Successfully logged in",
                             "token":f"bearer {token}"
