@@ -2,8 +2,8 @@ from auth_app import app
 from ..controllers.controller import allControllers
 controller=allControllers()
 from flask import request,jsonify
-# from .scheduler import start_scheduler
-# start_scheduler()
+from .scheduler import start_scheduler
+start_scheduler()
 # @app.route('/home')
 # #@token_required
 # def home_page():
@@ -35,5 +35,5 @@ def add_user_route():
         return jsonify({'error': 'No data provided'}), 400
 @app.route('/allUser', methods=['GET'])
 def show_all_users():
-    all_users = controller.show()
+    all_users = controller.publishers()
     return  (all_users)

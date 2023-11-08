@@ -3,7 +3,6 @@ from flask import  jsonify,request,json
 # from datetime import datetime, timedelta
 # from auth_app import bcrypt,app
 # import jwt
-# import mongoengine
 # from functools import wraps
 
 # def token_required(f):
@@ -115,7 +114,63 @@ from flask import  jsonify,request,json
 
 # ############for Mongo Engine #########
 from ..models.user import User
+from ..models.publishers import Publishers
+import csv
+
+
+
+
+
+
+# with open("D:\\Flask Folder Structure\\auth_app\\data\\library_publishers_202310271631.csv", 'r') as file:
+#     csvreader = csv.reader(file, delimiter=':')
+#     for row in csvreader:
+#         print(row)
+
 class allControllers:
+    def upload_img(self):
+            if 'file' not in request.files:
+                return "No file part in the request", 400
+
+            file = request.files['file']
+            if file.filename == '':
+                return "No selected file", 400
+
+            if file:
+                file.save('auth_app/uploads/' + file.filename) 
+                return "File uploaded successfully", 200
+
+            return "File upload failed", 500
+    def publishers(self):
+            csv_file = 'D:\\Flask Folder Structure\\auth_app\\data\\library_publishers_202310271631.csv'  # Replace this with your CSV file path
+
+            data_array = []
+            counter=0
+
+            try:
+                with open(csv_file, newline='') as file:
+                    csv_reader = csv.DictReader(file)
+                    for row in csv_reader:
+                        data_array.append(dict(row))
+
+                # print(data_array)
+
+            except FileNotFoundError as e:
+                print(f"File not found: {csv_file}")
+            except Exception as e:
+                print(f"An error occurred: {e}")
+
+            for data in data_array:
+                counter=counter+1
+                print(counter)
+                name = data.get('name')
+                genre_speciality = data.get('genre_speciality')
+                founded_date=data.get('founded_date')
+                city=data.get('city')
+                country=data.get('country')
+                new_publisher=Publishers(name=name,genre_speciality=genre_speciality,founded_date=founded_date,city=city,country=country)
+                new_publisher.save()
+            print(new_publisher)
     def add_user(self, data):
             name = data.get('name')
             age = data.get('age')
@@ -123,8 +178,10 @@ class allControllers:
                 new_user = User(name=name, age=age)
                 new_user.save()
                 return new_user
+  
     def show(self):
         all_users = User.objects().to_json()
-        return  jsonify(all_users)
+        print(all_users)
+       # return  jsonify(all_users)
 
 
